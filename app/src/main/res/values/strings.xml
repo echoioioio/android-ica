@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">ICA</string>
     <string name="title_activity_maps">MapsActivity</string>
+    <string name="save">Save</string>
+    <string name="new_task">New Task</string>
     <string name="tasks">Tasks</string>
 
 </resources>
