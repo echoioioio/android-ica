@@ -9,6 +9,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -23,28 +25,23 @@ import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements DialogCloseListener {
 
-    Button button;
-//    @Override
-//    protected void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_main);
-//
-//        button = (Button)findViewById(R.id.map_button);
-//
-//        button.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Intent i = new Intent(getApplicationContext(),MapsActivity.class);
-//                startActivity(i);
-//            }
-//        });
-//    }
-
+//    Button button;
+    Animation rotateOpen;
+    Animation rotateClose;
+    Animation fromBottom;
+    Animation toBottom;
+    //api to find location based on longitude and lattitude
+//https://api.myptv.com/geocoding/v1/locations/by-position/54.574226/-1.234956?language=en&apiKey=MjhhNDBjN2JmMmI2NGNmNGIyMWFjOWZlMDQ3OWIwOWI6MmQyMDY5YmYtOWJmMy00ZTg4LWE5NjctNDE1ZmFlMDM2MDdj
     private DatabaseHandler db;
 
     private RecyclerView tasksRecyclerView;
     private ToDoAdapter tasksAdapter;
     private FloatingActionButton fab;
+    private FloatingActionButton add_task_button;
+    private FloatingActionButton add_location_button;
+    private FloatingActionButton search_location_button;
+    private boolean clicked = false;
+
 
     private List<ToDoModel> taskList;
 
@@ -57,8 +54,21 @@ public class MainActivity extends AppCompatActivity implements DialogCloseListen
         db = new DatabaseHandler(this);
         db.openDatabase();
 
+        rotateOpen = AnimationUtils.loadAnimation(
+                this,R.anim.rotate_open_anim);
+        rotateClose = AnimationUtils.loadAnimation(
+                this,R.anim.rotate_close_anim);
+        fromBottom = AnimationUtils.loadAnimation(
+                this,R.anim.from_bottom_anim);
+        toBottom = AnimationUtils.loadAnimation(
+                this,R.anim.to_bottom_anim);
+
         tasksRecyclerView = findViewById(R.id.tasksRecyclerView);
         button = (Button)findViewById(R.id.map_button);
+        fab = findViewById(R.id.fab);
+        add_task_button = findViewById(R.id.add_task);
+        add_location_button = findViewById(R.id.add_location);
+        search_location_button = findViewById(R.id.search_location);
         tasksRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         tasksAdapter = new ToDoAdapter(db,MainActivity.this);
         tasksRecyclerView.setAdapter(tasksAdapter);
@@ -67,7 +77,6 @@ public class MainActivity extends AppCompatActivity implements DialogCloseListen
                 ItemTouchHelper(new RecyclerItemTouchHelper(tasksAdapter));
         itemTouchHelper.attachToRecyclerView(tasksRecyclerView);
 
-        fab = findViewById(R.id.fab);
 
         taskList = db.getAllTasks();
         Collections.reverse(taskList);
@@ -76,19 +85,76 @@ public class MainActivity extends AppCompatActivity implements DialogCloseListen
 
 
 
-        button.setOnClickListener(new View.OnClickListener() {
+//        button.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Intent i = new Intent(getApplicationContext(),MapsActivity.class);
+//                startActivity(i);
+//            }
+//        });
+        fab.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                Intent i = new Intent(getApplicationContext(),MapsActivity.class);
-                startActivity(i);
+            public void onClick(View v) {
+                //AddNewTask.newInstance().show(getSupportFragmentManager(), AddNewTask.TAG);
+                onfabClicked();
             }
         });
-        fab.setOnClickListener(new View.OnClickListener() {
+        add_task_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 AddNewTask.newInstance().show(getSupportFragmentManager(), AddNewTask.TAG);
             }
         });
+        add_location_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //AddNewTask.newInstance().show(getSupportFragmentManager(), AddNewTask.TAG);
+            }
+        });
+        //loads google maps activity
+        search_location_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //AddNewTask.newInstance().show(getSupportFragmentManager(), AddNewTask.TAG);
+                Intent i = new Intent(getApplicationContext(),MapsActivity.class);
+                startActivity(i);
+            }
+        });
+    }
+
+    public void onfabClicked(){
+        setVisibility(clicked);
+        setAnimation(clicked);
+        clicked = !clicked;
+    }
+    public void setVisibility(boolean clicked){
+        if(clicked){
+            add_task_button.setVisibility(View.INVISIBLE);
+            add_location_button.setVisibility(View.INVISIBLE);
+            search_location_button.setVisibility(View.INVISIBLE);
+
+        }else{
+            add_task_button.setVisibility(View.VISIBLE);
+            add_location_button.setVisibility(View.VISIBLE);
+            search_location_button.setVisibility(View.VISIBLE);
+
+        }
+
+    }
+    public void setAnimation(boolean clicked){
+        if(clicked){
+            add_task_button.setAnimation(toBottom);
+            add_location_button.setAnimation(toBottom);
+            search_location_button.setAnimation(toBottom);
+            fab.setAnimation(rotateClose);
+
+        }else{
+            add_task_button.setAnimation(fromBottom);
+            add_location_button.setAnimation(fromBottom);
+            search_location_button.setAnimation(fromBottom);
+            fab.setAnimation(rotateOpen);
+
+        }
     }
 
     @Override

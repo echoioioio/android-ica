@@ -37,7 +37,57 @@
         android:layout_marginBottom="32dp"
         android:backgroundTint="@android:color/holo_green_dark"
         android:contentDescription="@string/new_task"
-        android:src="@drawable/ic_baseline_add_24" />
+        android:focusable="true"
+        android:src="@drawable/ic_baseline_add_24"
+        android:tint="@color/white" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/search_location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/fab"
+        android:layout_alignEnd="@+id/fab"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="0dp"
+        android:layout_marginBottom="1dp"
+        android:backgroundTint="@android:color/holo_green_dark"
+        android:contentDescription="@string/new_task"
+        android:focusable="true"
+        android:src="@drawable/find_location"
+        android:visibility="invisible" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/add_task"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/search_location"
+        android:layout_alignEnd="@+id/search_location"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="0dp"
+        android:layout_marginBottom="1dp"
+        android:backgroundTint="@android:color/holo_green_dark"
+        android:contentDescription="@string/new_task"
+        android:focusable="true"
+        android:src="@drawable/add_without_location"
+        android:visibility="invisible" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/add_location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/add_task"
+        android:layout_alignEnd="@+id/add_task"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="0dp"
+        android:layout_marginBottom="1dp"
+        android:backgroundTint="@android:color/holo_green_dark"
+        android:contentDescription="@string/new_task"
+        android:focusable="true"
+        android:src="@drawable/add_with_location"
+        android:visibility="invisible" />
 
     <Button
         android:id="@+id/map_button"
