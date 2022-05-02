@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -29,6 +30,7 @@ public class AddNewTask extends BottomSheetDialogFragment {
     public static final String TAG = "ActionBottomDialog";
     private EditText newTaskText;
     private Button newTaskSaveButton;
+    private TextView newTaskLocation;
 
     private DatabaseHandler db;
 
@@ -101,12 +103,14 @@ public class AddNewTask extends BottomSheetDialogFragment {
             @Override
             public void onClick(View v) {
                 String text = newTaskText.getText().toString();
+                String location = "United Kingdom";
                 if(finalIsUpdate){
                     db.updateTask(bundle.getInt("id"), text);
                 }
                 else {
                     ToDoModel task = new ToDoModel();
                     task.setTask(text);
+                    task.setLocation(location);
                     task.setStatus(0);
                     db.insertTask(task);
                 }

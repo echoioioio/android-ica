@@ -7,10 +7,11 @@
         <entry key="app/src/main/res/drawable-v24/ic_baseline_delete.xml" value="0.198" />
         <entry key="app/src/main/res/drawable/add_without_location.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.1" />
-        <entry key="app/src/main/res/layout/activity_main.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.145050048828125" />
         <entry key="app/src/main/res/layout/activity_maps.xml" value="0.182518115942029" />
         <entry key="app/src/main/res/layout/activity_splash.xml" value="0.182518115942029" />
         <entry key="app/src/main/res/layout/new_task.xml" value="0.182518115942029" />
+        <entry key="app/src/main/res/layout/task_layout.xml" value="0.25031458612892965" />
         <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.201" />
       </map>
     </option>

@@ -1,10 +1,12 @@
 package uk.ac.tees.aad.b1475063.Utils;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import uk.ac.tees.aad.b1475063.Model.ToDoModel;
 
@@ -17,10 +19,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String NAME = "toDoListDatabase";
     private static final String TODO_TABLE = "todo";
     private static final String ID = "id";
+    private static final String LOCATION = "location";
     private static final String TASK = "task";
     private static final String STATUS = "status";
     private static final String CREATE_TODO_TABLE = "CREATE TABLE " + TODO_TABLE + "(" + ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + TASK + " TEXT, "
-            + STATUS + " INTEGER)";
+            + LOCATION + " TEXT, " + STATUS + " INTEGER)";
 
     private SQLiteDatabase db;
 
@@ -30,6 +33,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+
         db.execSQL(CREATE_TODO_TABLE);
     }
 
@@ -42,16 +46,22 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     public void openDatabase() {
+        Log.d("logger from database handler","hello");
+
         db = this.getWritableDatabase();
+//        db.execSQL("DROP TABLE IF EXISTS " + TODO_TABLE);
+
     }
 
     public void insertTask(ToDoModel task){
         ContentValues cv = new ContentValues();
         cv.put(TASK, task.getTask());
+        cv.put(LOCATION, task.getLocation());
         cv.put(STATUS, 0);
         db.insert(TODO_TABLE, null, cv);
     }
 
+    @SuppressLint("Range")
     public List<ToDoModel> getAllTasks(){
         List<ToDoModel> taskList = new ArrayList<>();
         Cursor cur = null;
@@ -63,6 +73,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     do{
                         ToDoModel task = new ToDoModel();
                         task.setId(cur.getInt(cur.getColumnIndex(ID)));
+                        task.setLocation(cur.getString(cur.getColumnIndex(LOCATION)));
                         task.setTask(cur.getString(cur.getColumnIndex(TASK)));
                         task.setStatus(cur.getInt(cur.getColumnIndex(STATUS)));
                         taskList.add(task);

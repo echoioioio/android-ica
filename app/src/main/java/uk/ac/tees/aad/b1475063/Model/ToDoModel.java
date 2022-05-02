@@ -2,7 +2,7 @@ package uk.ac.tees.aad.b1475063.Model;
 
 public class ToDoModel {
     private int id, status;
-    private String task;
+    private String task,location;
 
     public int getId() {
         return id;
@@ -26,5 +26,13 @@ public class ToDoModel {
 
     public void setTask(String task) {
         this.task = task;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String task) {
+        this.location = location;
     }
 }
