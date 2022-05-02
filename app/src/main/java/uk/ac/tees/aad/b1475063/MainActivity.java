@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -50,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements DialogCloseListen
     private FloatingActionButton add_location_button;
     private FloatingActionButton search_location_button;
     private boolean clicked = false;
-
+    String currentLocationAddress;
 
     private List<ToDoModel> taskList;
 
@@ -110,7 +111,7 @@ public class MainActivity extends AppCompatActivity implements DialogCloseListen
         add_location_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //AddNewTask.newInstance().show(getSupportFragmentManager(), AddNewTask.TAG);
+                AddNewTask.newInstance().show(getSupportFragmentManager(), AddNewTask.TAG);
             }
         });
         //loads google maps activity
@@ -125,17 +126,21 @@ public class MainActivity extends AppCompatActivity implements DialogCloseListen
 
 
         //=================================
-        String url = "http://api.giphy.com/v1/gifs/search?q=funny+cat&api_key=dc6zaTOxFJmzC";
+        String url = "https://api.myptv.com/geocoding/v1/locations/by-position/54.574226/-1.234956?language=en&apiKey=MjhhNDBjN2JmMmI2NGNmNGIyMWFjOWZlMDQ3OWIwOWI6MmQyMDY5YmYtOWJmMy00ZTg4LWE5NjctNDE1ZmFlMDM2MDdj";
+        Log.d("STATE","HELLO");
         StringRequest stringRequest = new StringRequest(url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 try {
+                    Log.d("STATE","received response");
                     JSONObject jsonObject = new JSONObject(response);
-                    JSONArray jsonArray = jsonObject.getJSONArray("data");
+                    JSONArray jsonArray = jsonObject.getJSONArray("locations");
+                    Log.d("STATE", String.valueOf(jsonArray.length()));
+
                     for (int i = 0; i < jsonArray.length(); i++) {
-                        JSONObject jo = jsonArray.getJSONObject(i);
-                        // Do you fancy stuff
-                        // Example: String gifUrl = jo.getString("url");
+                        JSONObject jObject = jsonArray.getJSONObject(i);
+//                        Log.d("STATE", String.valueOf(jObject.getString("formattedAddress")));
+                        currentLocationAddress = jObject.getString("formattedAddress");
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
