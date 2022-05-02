@@ -1,12 +1,17 @@
 package uk.ac.tees.aad.b1475063;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -33,6 +38,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+
 public class MainActivity extends AppCompatActivity implements DialogCloseListener {
 
 //    Button button;
@@ -43,7 +54,7 @@ public class MainActivity extends AppCompatActivity implements DialogCloseListen
     //api to find location based on longitude and lattitude
 //https://api.myptv.com/geocoding/v1/locations/by-position/54.574226/-1.234956?language=en&apiKey=MjhhNDBjN2JmMmI2NGNmNGIyMWFjOWZlMDQ3OWIwOWI6MmQyMDY5YmYtOWJmMy00ZTg4LWE5NjctNDE1ZmFlMDM2MDdj
     private DatabaseHandler db;
-
+    private static final int REQUEST_LOCATION_PERMISSION =1 ;
     private RecyclerView tasksRecyclerView;
     private ToDoAdapter tasksAdapter;
     private FloatingActionButton fab;
@@ -51,10 +62,13 @@ public class MainActivity extends AppCompatActivity implements DialogCloseListen
     private FloatingActionButton add_location_button;
     private FloatingActionButton search_location_button;
     private boolean clicked = false;
-    String currentLocationAddress;
+    public static String currentLocationAddress = "???";
+    double latitude;
+    double longitude;
 
     private List<ToDoModel> taskList;
 
+    @SuppressLint("MissingPermission")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -123,38 +137,59 @@ public class MainActivity extends AppCompatActivity implements DialogCloseListen
                 startActivity(i);
             }
         });
-
-
-        //=================================
-        String url = "https://api.myptv.com/geocoding/v1/locations/by-position/54.574226/-1.234956?language=en&apiKey=MjhhNDBjN2JmMmI2NGNmNGIyMWFjOWZlMDQ3OWIwOWI6MmQyMDY5YmYtOWJmMy00ZTg4LWE5NjctNDE1ZmFlMDM2MDdj";
-        Log.d("STATE","HELLO");
-        StringRequest stringRequest = new StringRequest(url, new Response.Listener<String>() {
+        //get longitude and lattitude
+        //===========================
+        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        LocationListener locationListener;
+        locationListener = new LocationListener() {
             @Override
-            public void onResponse(String response) {
-                try {
-                    Log.d("STATE","received response");
-                    JSONObject jsonObject = new JSONObject(response);
-                    JSONArray jsonArray = jsonObject.getJSONArray("locations");
-                    Log.d("STATE", String.valueOf(jsonArray.length()));
+            public void onLocationChanged(Location location) {
+                /* User's latitude and longitude is fetched here using the location object. */
+                latitude = location.getLatitude();
+                longitude = location.getLongitude();
+                Log.d("latitude and longitue",Double.toString(latitude)+" "+Double.toString(longitude));
+            //===
+                String url = "https://api.myptv.com/geocoding/v1/locations/by-position/"+Double.toString(latitude)+"/"+Double.toString(longitude)+"?language=en&apiKey=MjhhNDBjN2JmMmI2NGNmNGIyMWFjOWZlMDQ3OWIwOWI6MmQyMDY5YmYtOWJmMy00ZTg4LWE5NjctNDE1ZmFlMDM2MDdj";
+                Log.d("STATE",url);
+                StringRequest stringRequest = new StringRequest(url, new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            Log.d("STATE","received response");
+                            JSONObject jsonObject = new JSONObject(response);
+                            JSONArray jsonArray = jsonObject.getJSONArray("locations");
+                            Log.d("STATE", String.valueOf(jsonArray.length()));
 
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        JSONObject jObject = jsonArray.getJSONObject(i);
+                            for (int i = 0; i < jsonArray.length(); i++) {
+                                JSONObject jObject = jsonArray.getJSONObject(i);
 //                        Log.d("STATE", String.valueOf(jObject.getString("formattedAddress")));
-                        currentLocationAddress = jObject.getString("formattedAddress");
+                                currentLocationAddress = jObject.getJSONObject("address").getString("city");
+                                Log.d("location from main: ",currentLocationAddress);
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e("volley error: ",error.toString());
+                    }
+                });
+                RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+                requestQueue.add(stringRequest);
+            //===
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                // Anything you want
-            }
-        });
-        RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
-        requestQueue.add(stringRequest);
-        //==================================
+        };
+        //ask for permission to get the location
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]
+                            {Manifest.permission.ACCESS_FINE_LOCATION},
+                    REQUEST_LOCATION_PERMISSION);
+        }
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,0,0,locationListener);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0,locationListener);
+        
 
     }
 

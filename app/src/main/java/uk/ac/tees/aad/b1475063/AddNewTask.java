@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -103,7 +104,8 @@ public class AddNewTask extends BottomSheetDialogFragment {
             @Override
             public void onClick(View v) {
                 String text = newTaskText.getText().toString();
-                String location = "United Kingdom";
+                String location = MainActivity.currentLocationAddress;
+                Log.d("this is the current activity: ",this.getClass().toString());
                 if(finalIsUpdate){
                     db.updateTask(bundle.getInt("id"), text);
                 }
