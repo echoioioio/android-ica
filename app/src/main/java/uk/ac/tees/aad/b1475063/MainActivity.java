@@ -13,7 +13,16 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import uk.ac.tees.aad.b1475063.Adapters.ToDoAdapter;
 import uk.ac.tees.aad.b1475063.Model.ToDoModel;
@@ -54,17 +63,10 @@ public class MainActivity extends AppCompatActivity implements DialogCloseListen
         db = new DatabaseHandler(this);
         db.openDatabase();
 
-        rotateOpen = AnimationUtils.loadAnimation(
-                this,R.anim.rotate_open_anim);
-        rotateClose = AnimationUtils.loadAnimation(
-                this,R.anim.rotate_close_anim);
-        fromBottom = AnimationUtils.loadAnimation(
-                this,R.anim.from_bottom_anim);
-        toBottom = AnimationUtils.loadAnimation(
-                this,R.anim.to_bottom_anim);
+
 
         tasksRecyclerView = findViewById(R.id.tasksRecyclerView);
-        button = (Button)findViewById(R.id.map_button);
+//        button = (Button)findViewById(R.id.map_button);
         fab = findViewById(R.id.fab);
         add_task_button = findViewById(R.id.add_task);
         add_location_button = findViewById(R.id.add_location);
@@ -120,9 +122,50 @@ public class MainActivity extends AppCompatActivity implements DialogCloseListen
                 startActivity(i);
             }
         });
+
+
+        //=================================
+        String url = "http://api.giphy.com/v1/gifs/search?q=funny+cat&api_key=dc6zaTOxFJmzC";
+        StringRequest stringRequest = new StringRequest(url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                try {
+                    JSONObject jsonObject = new JSONObject(response);
+                    JSONArray jsonArray = jsonObject.getJSONArray("data");
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject jo = jsonArray.getJSONObject(i);
+                        // Do you fancy stuff
+                        // Example: String gifUrl = jo.getString("url");
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                // Anything you want
+            }
+        });
+        RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+        requestQueue.add(stringRequest);
+        //==================================
+
     }
 
+    public void assignAnimations(){
+        //this is put here so that the animations don't bug out after the first play
+        rotateOpen = AnimationUtils.loadAnimation(
+                this,R.anim.rotate_open_anim);
+        rotateClose = AnimationUtils.loadAnimation(
+                this,R.anim.rotate_close_anim);
+        fromBottom = AnimationUtils.loadAnimation(
+                this,R.anim.from_bottom_anim);
+        toBottom = AnimationUtils.loadAnimation(
+                this,R.anim.to_bottom_anim);
+    }
     public void onfabClicked(){
+        assignAnimations();
         setVisibility(clicked);
         setAnimation(clicked);
         clicked = !clicked;
