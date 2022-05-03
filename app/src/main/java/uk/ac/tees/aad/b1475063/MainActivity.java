@@ -136,7 +136,7 @@ public class MainActivity extends AppCompatActivity implements DialogCloseListen
         search_location_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getLocationCheck = false;
+                getLocationCheck = true;
                 //AddNewTask.newInstance().show(getSupportFragmentManager(), AddNewTask.TAG);
 //                Intent i = new Intent(getApplicationContext(),MapsActivity.class);
 //                startActivity(i);

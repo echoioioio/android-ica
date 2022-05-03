@@ -1,5 +1,6 @@
 package uk.ac.tees.aad.b1475063;
 
+import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentActivity;
 
@@ -12,6 +13,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -26,12 +28,13 @@ import java.util.List;
 
 import uk.ac.tees.aad.b1475063.databinding.ActivityMapsBinding;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
-    private static final int REQUEST_LOCATION_PERMISSION =1 ;
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapClickListener {
+//    private static final int REQUEST_LOCATION_PERMISSION =1 ;
     private GoogleMap mMap;
     LocationManager locationManager;
     LocationListener locationListener;
     Marker marker;
+    LatLng touchCoordinates;
 
     @SuppressLint("MissingPermission")
     @Override
@@ -42,71 +45,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
-        /* Location Manager use either the Network provider or GPS provider of the android device to fetch the location
-        information of the user, like latitude or longitude. */
-
-        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-
-        /* This part asks for location access permission from the user. */
-
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]
-                            {Manifest.permission.ACCESS_FINE_LOCATION},
-                    REQUEST_LOCATION_PERMISSION);
-        }
-
-        locationListener = new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                /* User's latitude and longitude is fetched here using the location object. */
-                double latitude = location.getLatitude();
-                double longitude = location.getLongitude();
+        double latitude;
+        double longitude;
 
 
-                /* Geocoder derives the location name, the specific country and city of the user as a list. */
-                Geocoder geocoder = new Geocoder(getApplicationContext());
-                try {
-                    List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
-                    String adress = addresses.get(0).getLocality() + ":";
-                    adress += addresses.get(0).getCountryName();
+        /* Geocoder derives the location name, the specific country and city of the user as a list. */
+//        Geocoder geocoder = new Geocoder(getApplicationContext());
+        //            List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
+//            String adress = addresses.get(0).getLocality() + ":";
+//            adress += addresses.get(0).getCountryName();
 
-                    /* The latitude and longitude is combined and placed on the google map using a marker in the following part. */
+        /* The latitude and longitude is combined and placed on the google map using a marker in the following part. */
 
-                    LatLng latLng = new LatLng(latitude, longitude);
-
-                    if (marker != null) {
-                        marker.remove();
-                    }
-                    marker = mMap.addMarker(new MarkerOptions().position(latLng).title(adress));
-                    mMap.setMaxZoomPreference(10);
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10.0f));
+//            LatLng latLng = new LatLng(latitude, longitude);
 
 
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onStatusChanged(String s, int i, Bundle bundle) {
-
-            }
-
-            @Override
-            public void onProviderEnabled(String s) {
-
-            }
-
-            @Override
-            public void onProviderDisabled(String s) {
-
-            }
-        };
-
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,0,0,locationListener);
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0,locationListener);
 
     }
 
@@ -121,6 +74,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      * installed Google Play services and returned to the app.
      */
 
+
     @Override
     protected void onStop() {
         super.onStop();
@@ -130,5 +84,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap=googleMap;
+        mMap.setOnMapClickListener(this);
+
+    }
+
+    @Override
+    public void onMapClick(LatLng latLng) {
+        Log.d("touch coordinate from the map: ", latLng.toString());
+        touchCoordinates = latLng;
+        try {
+            if (marker != null) {
+                marker.remove();
+            }
+            marker = mMap.addMarker(new MarkerOptions().position(touchCoordinates).title("location ???"));
+            mMap.setMaxZoomPreference(10);
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(touchCoordinates, 10.0f));
+        }catch(Exception e){
+            Log.e("maps marker: ","marker problem");
+        }
     }
 }
