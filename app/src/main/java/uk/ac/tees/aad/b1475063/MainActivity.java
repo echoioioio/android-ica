@@ -11,6 +11,7 @@ import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
@@ -51,6 +52,8 @@ public class MainActivity extends AppCompatActivity implements DialogCloseListen
     Animation rotateClose;
     Animation fromBottom;
     Animation toBottom;
+    Animation landscape_from_bottom;
+    Animation landscape_to_bottom;
     //api to find location based on longitude and lattitude
 //https://api.myptv.com/geocoding/v1/locations/by-position/54.574226/-1.234956?language=en&apiKey=MjhhNDBjN2JmMmI2NGNmNGIyMWFjOWZlMDQ3OWIwOWI6MmQyMDY5YmYtOWJmMy00ZTg4LWE5NjctNDE1ZmFlMDM2MDdj
     private DatabaseHandler db;
@@ -69,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements DialogCloseListen
     public static String chosenCustomLocation = " ";
     double latitude;
     double longitude;
+    int orientation;
 
     private List<ToDoModel> taskList;
 
@@ -168,6 +172,7 @@ public class MainActivity extends AppCompatActivity implements DialogCloseListen
             @Override
             public void onClick(View v) {
                 //AddNewTask.newInstance().show(getSupportFragmentManager(), AddNewTask.TAG);
+                orientation = getResources().getConfiguration().orientation;
                 onfabClicked();
 
             }
@@ -214,6 +219,8 @@ public class MainActivity extends AppCompatActivity implements DialogCloseListen
                 this,R.anim.from_bottom_anim);
         toBottom = AnimationUtils.loadAnimation(
                 this,R.anim.to_bottom_anim);
+        landscape_from_bottom = AnimationUtils.loadAnimation(this,R.anim.landscape_from_bottom_anim);
+        landscape_to_bottom = AnimationUtils.loadAnimation(this,R.anim.landscape_to_bottom_anim);
     }
     public void onfabClicked(){
         assignAnimations();
@@ -237,15 +244,27 @@ public class MainActivity extends AppCompatActivity implements DialogCloseListen
     }
     public void setAnimation(boolean clicked){
         if(clicked){
-            add_task_button.setAnimation(toBottom);
-            add_location_button.setAnimation(toBottom);
-            search_location_button.setAnimation(toBottom);
+            if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                add_task_button.setAnimation(landscape_to_bottom);
+                add_location_button.setAnimation(landscape_to_bottom);
+                search_location_button.setAnimation(landscape_to_bottom);
+            }else {
+                add_task_button.setAnimation(toBottom);
+                add_location_button.setAnimation(toBottom);//landscape_to_bottom);
+                search_location_button.setAnimation(toBottom);
+            }
             fab.setAnimation(rotateClose);
 
         }else{
-            add_task_button.setAnimation(fromBottom);
-            add_location_button.setAnimation(fromBottom);
-            search_location_button.setAnimation(fromBottom);
+            if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                add_task_button.setAnimation(landscape_from_bottom);
+                add_location_button.setAnimation(landscape_from_bottom);
+                search_location_button.setAnimation(landscape_from_bottom);
+            }else{
+                add_task_button.setAnimation(fromBottom);
+                add_location_button.setAnimation(fromBottom);//landscape_from_bottom);
+                search_location_button.setAnimation(fromBottom);
+            }
             fab.setAnimation(rotateOpen);
 
         }
