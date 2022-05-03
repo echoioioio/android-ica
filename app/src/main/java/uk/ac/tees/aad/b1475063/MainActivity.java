@@ -62,7 +62,9 @@ public class MainActivity extends AppCompatActivity implements DialogCloseListen
     private FloatingActionButton add_location_button;
     private FloatingActionButton search_location_button;
     private boolean clicked = false;
-    public static String currentLocationAddress = "???";
+    public static boolean getLocationCheck = false;
+
+    public static String currentLocationAddress = " ";
     double latitude;
     double longitude;
 
@@ -120,11 +122,13 @@ public class MainActivity extends AppCompatActivity implements DialogCloseListen
             @Override
             public void onClick(View v) {
                 AddNewTask.newInstance().show(getSupportFragmentManager(), AddNewTask.TAG);
+                getLocationCheck = false;
             }
         });
         add_location_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                getLocationCheck = true;
                 AddNewTask.newInstance().show(getSupportFragmentManager(), AddNewTask.TAG);
             }
         });
@@ -132,9 +136,11 @@ public class MainActivity extends AppCompatActivity implements DialogCloseListen
         search_location_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                getLocationCheck = false;
                 //AddNewTask.newInstance().show(getSupportFragmentManager(), AddNewTask.TAG);
-                Intent i = new Intent(getApplicationContext(),MapsActivity.class);
-                startActivity(i);
+//                Intent i = new Intent(getApplicationContext(),MapsActivity.class);
+//                startActivity(i);
+                new AddNewTaskWithLocation().show(getSupportFragmentManager(),AddNewTaskWithLocation.TAG);
             }
         });
         //get longitude and lattitude
@@ -147,8 +153,8 @@ public class MainActivity extends AppCompatActivity implements DialogCloseListen
                 /* User's latitude and longitude is fetched here using the location object. */
                 latitude = location.getLatitude();
                 longitude = location.getLongitude();
-                Log.d("latitude and longitue",Double.toString(latitude)+" "+Double.toString(longitude));
-            //===
+                Log.d("latitude and longitude",Double.toString(latitude)+" "+Double.toString(longitude));
+            //=== Getting city name from lattitude and longitude
                 String url = "https://api.myptv.com/geocoding/v1/locations/by-position/"+Double.toString(latitude)+"/"+Double.toString(longitude)+"?language=en&apiKey=MjhhNDBjN2JmMmI2NGNmNGIyMWFjOWZlMDQ3OWIwOWI6MmQyMDY5YmYtOWJmMy00ZTg4LWE5NjctNDE1ZmFlMDM2MDdj";
                 Log.d("STATE",url);
                 StringRequest stringRequest = new StringRequest(url, new Response.Listener<String>() {
@@ -176,11 +182,13 @@ public class MainActivity extends AppCompatActivity implements DialogCloseListen
                         Log.e("volley error: ",error.toString());
                     }
                 });
-                RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
-                requestQueue.add(stringRequest);
-            //===
+                    RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+                    requestQueue.add(stringRequest);
+
+                //===
             }
         };
+
         //ask for permission to get the location
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]
@@ -189,7 +197,7 @@ public class MainActivity extends AppCompatActivity implements DialogCloseListen
         }
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,0,0,locationListener);
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0,locationListener);
-        
+
 
     }
 
