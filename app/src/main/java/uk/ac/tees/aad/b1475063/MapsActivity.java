@@ -14,6 +14,8 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -35,6 +37,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     LocationListener locationListener;
     Marker marker;
     LatLng touchCoordinates;
+    Button chooseLocation;
 
     @SuppressLint("MissingPermission")
     @Override
@@ -45,8 +48,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-        double latitude;
-        double longitude;
+        chooseLocation = findViewById(R.id.saveLocationButton);
+
 
 
         /* Geocoder derives the location name, the specific country and city of the user as a list. */
@@ -59,7 +62,28 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 //            LatLng latLng = new LatLng(latitude, longitude);
 
-
+        chooseLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                double latitude = touchCoordinates.latitude;
+                double longitude = touchCoordinates.longitude;
+                Geocoder geocoder = new Geocoder(getApplicationContext());
+                List<Address> addresses = null;
+                try {
+                    addresses = geocoder.getFromLocation(latitude, longitude, 1);
+                } catch (IOException e) {
+                    Log.d("Maps: ","could not find location based on coordinates.");
+                    e.printStackTrace();
+                }
+                String address = addresses.get(0).getLocality();
+                if(address==""){
+                    address+="???";
+                }
+                Log.d("the chosen location: ","="+address);
+                MainActivity.chosenCustomLocation = address;
+                finish();
+            }
+        });
 
     }
 
@@ -78,7 +102,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onStop() {
         super.onStop();
-        locationManager.removeUpdates(locationListener);
+        Log.d("Maps: ","maps activity is completed properly.");
     }
 
     @Override

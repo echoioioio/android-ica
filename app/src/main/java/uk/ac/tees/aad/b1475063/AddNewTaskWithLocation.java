@@ -125,6 +125,9 @@ public class AddNewTaskWithLocation extends BottomSheetDialogFragment {
                 }else{
                     location = "";//if the task without location button is clicked this case is chosen
                 }
+                if(MainActivity.getCustomLocation){
+                    location = MainActivity.chosenCustomLocation;
+                }
                 Log.d("this is the current activity: ",this.getClass().toString());
                 if(finalIsUpdate){
                     db.updateTask(bundle.getInt("id"), text);

@@ -63,8 +63,10 @@ public class MainActivity extends AppCompatActivity implements DialogCloseListen
     private FloatingActionButton search_location_button;
     private boolean clicked = false;
     public static boolean getLocationCheck = false;
+    public static boolean getCustomLocation = false;
 
-    public static String currentLocationAddress = " ";
+    public static String currentLocationAddress = "???";
+    public static String chosenCustomLocation = " ";
     double latitude;
     double longitude;
 
@@ -104,45 +106,7 @@ public class MainActivity extends AppCompatActivity implements DialogCloseListen
 
 
 
-//        button.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Intent i = new Intent(getApplicationContext(),MapsActivity.class);
-//                startActivity(i);
-//            }
-//        });
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //AddNewTask.newInstance().show(getSupportFragmentManager(), AddNewTask.TAG);
-                onfabClicked();
-            }
-        });
-        add_task_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AddNewTask.newInstance().show(getSupportFragmentManager(), AddNewTask.TAG);
-                getLocationCheck = false;
-            }
-        });
-        add_location_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getLocationCheck = true;
-                AddNewTask.newInstance().show(getSupportFragmentManager(), AddNewTask.TAG);
-            }
-        });
-        //loads google maps activity
-        search_location_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getLocationCheck = true;
-                //AddNewTask.newInstance().show(getSupportFragmentManager(), AddNewTask.TAG);
-//                Intent i = new Intent(getApplicationContext(),MapsActivity.class);
-//                startActivity(i);
-                new AddNewTaskWithLocation().show(getSupportFragmentManager(),AddNewTaskWithLocation.TAG);
-            }
-        });
+
         //get longitude and lattitude
         //===========================
         LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
@@ -154,7 +118,7 @@ public class MainActivity extends AppCompatActivity implements DialogCloseListen
                 latitude = location.getLatitude();
                 longitude = location.getLongitude();
                 Log.d("latitude and longitude",Double.toString(latitude)+" "+Double.toString(longitude));
-            //=== Getting city name from lattitude and longitude
+                //=== Getting city name from lattitude and longitude from 3rd party api
                 String url = "https://api.myptv.com/geocoding/v1/locations/by-position/"+Double.toString(latitude)+"/"+Double.toString(longitude)+"?language=en&apiKey=MjhhNDBjN2JmMmI2NGNmNGIyMWFjOWZlMDQ3OWIwOWI6MmQyMDY5YmYtOWJmMy00ZTg4LWE5NjctNDE1ZmFlMDM2MDdj";
                 Log.d("STATE",url);
                 StringRequest stringRequest = new StringRequest(url, new Response.Listener<String>() {
@@ -182,8 +146,8 @@ public class MainActivity extends AppCompatActivity implements DialogCloseListen
                         Log.e("volley error: ",error.toString());
                     }
                 });
-                    RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
-                    requestQueue.add(stringRequest);
+                RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+                requestQueue.add(stringRequest);
 
                 //===
             }
@@ -197,6 +161,45 @@ public class MainActivity extends AppCompatActivity implements DialogCloseListen
         }
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,0,0,locationListener);
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0,locationListener);
+
+
+
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //AddNewTask.newInstance().show(getSupportFragmentManager(), AddNewTask.TAG);
+                onfabClicked();
+
+            }
+        });
+        add_task_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AddNewTask.newInstance().show(getSupportFragmentManager(), AddNewTask.TAG);
+                getLocationCheck = false;
+            }
+        });
+        add_location_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getLocationCheck = true;
+                AddNewTask.newInstance().show(getSupportFragmentManager(), AddNewTask.TAG);
+                locationManager.removeUpdates(locationListener);
+
+            }
+        });
+        //loads google maps activity
+        search_location_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getLocationCheck = false;
+                getCustomLocation = true;
+                //AddNewTask.newInstance().show(getSupportFragmentManager(), AddNewTask.TAG);
+//                Intent i = new Intent(getApplicationContext(),MapsActivity.class);
+//                startActivity(i);
+                new AddNewTaskWithLocation().show(getSupportFragmentManager(),AddNewTaskWithLocation.TAG);
+            }
+        });
 
 
     }
